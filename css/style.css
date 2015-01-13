@@ -1,0 +1,66 @@
+@font-face {
+	font-family: "Georgia";
+	font-size: 8px;
+	src: url(../data/font/georgia.ttf);
+}
+
+@font-face {
+	font-family: "Nevis";
+	font-size: 20px;
+	src: url(../data/font/nevis.ttf);
+}
+
+body {
+	background: #1D1B1A;
+	color: #fff;
+
+	/* Allow mouse dragging. */
+	-webkit-touch-callout: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-o-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+	
+	/* disable touch panning/zooming */
+	-ms-touch-action: none;
+	touch-action: none;
+
+	/* Allow canvas to hit the edges of the browser viewport. */
+	margin: 0;
+}
+
+#screen canvas {
+	margin: auto;
+
+	/* Hide the gap for font descenders. */
+	display: block;
+	
+	/* disable scaling interpolation */
+	image-rendering: optimizeSpeed;
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -o-crisp-edges;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: optimize-contrast;
+	-ms-interpolation-mode: nearest-neighbor;
+}
+
+#hidden {
+	visibility: hidden;
+	position: absolute;
+	top: -9999px;
+	left: -9999px;
+}
+
+#game {
+	margin: 0 auto;
+	min-height: 768px;
+	height: 768px;
+	max-height: 768px;
+	min-width: 1024px;
+	width: 1024px;
+	max-width: 1024px;
+	background: #000;
+	overflow: hidden;
+}
