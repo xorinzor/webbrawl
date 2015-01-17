@@ -24,7 +24,13 @@ var game = {
     "onload" : function () {
         
         // Initialize the video.
-        if (!me.video.init("screen",  me.video.CANVAS, 1024, 768, true, 0)) {
+        if (!me.video.init(1024, 768, {
+            wrapper: "screen", 
+            renderer: me.video.CANVAS,
+            scale: 0, 
+            maintainAspectRatio: true, 
+            transparent: false
+        })) {
             alert("Your browser does not support HTML5 canvas.");
             return;
         }
@@ -57,10 +63,10 @@ var game = {
 
     // Run on game resources loaded.
     "loaded" : function () {
+        me.audio.playTrack("mainmenu", 0.7);
+        
         me.state.set(me.state.MENU, new game.Screen.MainMenu());
         me.state.set(me.state.PLAY, new game.Screen.PlayScreen());
-        
-        //me.audio.playTrack("mainmenu", 0.7);
         
         me.game.viewport.fadeIn("#000", 500, function(){
             me.state.change(me.state.MENU);  
@@ -70,25 +76,15 @@ var game = {
         me.pool.register("ExplosionEntity",     game.ExplosionEntity);
         me.pool.register("DeathEffectEntity",   game.DeathEffectEntity);
         
-        me.pool.register("mainPlayer",          me.PlayerEntity);
-        me.pool.register("aiPlayer",            me.AIEntity);
+        me.pool.register("PlayerEntity",        me.PlayerEntity);
+        me.pool.register("AIPlayerEntity",      me.AIEntity);
+        
+        me.pool.register("solid",      game.CollisionSolid);
+        me.pool.register("death",      game.CollisionDeath);
         
         me.input.bindKey(me.input.KEY.A,        "left");
         me.input.bindKey(me.input.KEY.D,        "right");
-        me.input.bindKey(me.input.KEY.W,        "jump",     true);
-        me.input.bindKey(me.input.KEY.SHIFT,    "attack",   true);
-        
-        /*
-        me.state.change(me.state.PLAY);
-        
-        me.game.world.addChild(me.pool.pull("aiPlayer", 600, 250, {
-            image: 'basic_player',
-            name: "bot",
-            width: 64,
-            height: 64,
-            spritewidth: 64,
-            spriteheight: 64
-        }));
-        */
+        me.input.bindKey(me.input.KEY.W,        "jump");
+        me.input.bindKey(me.input.KEY.SHIFT,    "attack");
     }
 };

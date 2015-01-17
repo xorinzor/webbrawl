@@ -28,7 +28,7 @@
 		<!-- melonJS Library -->
 		<!-- build:js js/app.min.js -->
 		<script type="text/javascript" src="lib/jquery-1.11.1.min.js"></script>
-		<script type="text/javascript" src="lib/melonJS-2.0.2.js"></script>
+		<script type="text/javascript" src="lib/melonJS-2.1.0.js"></script>
 
 		<!-- Plugin(s) -->
 		<script type="text/javascript" src="lib/plugins/debug/debugPanel.js"></script>
@@ -39,7 +39,10 @@
 		<script type="text/javascript" src="js/sprites.js"></script>
 		
 		<script type="text/javascript" src="js/classes/CustomImageLayer.js"></script>
+		<script type="text/javascript" src="js/classes/CustomEntity.js"></script>
 		<script type="text/javascript" src="js/classes/menu.js"></script>
+		<script type="text/javascript" src="js/classes/EntityHelper.js"></script>
+		<script type="text/javascript" src="js/classes/CollisionSolid.js"></script>
 
 		<script type="text/javascript" src="js/entities/PlayerEntity.js"></script>
 		<script type="text/javascript" src="js/entities/AIEntity.js"></script>

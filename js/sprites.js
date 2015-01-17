@@ -15,7 +15,7 @@ game.sprites = {
 		*/
         
 		red_button: {
-			image: "ui_tileset", spritewidth: 190, spriteheight: 49,
+			image: "ui_tileset", framewidth: 190, frameheight: 49,
 			state: {
 				normal: { x: 194,	y: 1283 },
 				hover: 	{ x: 194,	y: 1283 },

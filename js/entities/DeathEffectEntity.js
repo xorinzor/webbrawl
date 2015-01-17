@@ -8,8 +8,8 @@ game.DeathEffectEntity = me.Sprite.extend({
 		
 		// create new vector and set initial particle velocity
 		this.angle = Number.prototype.degToRad(angle);
-		this.spritewidth = 155;
-		this.spriteheight = 250;
+		this.framewidth = 155;
+		this.frameheight = 250;
 		this.scale(3, 3);
 	},
 	

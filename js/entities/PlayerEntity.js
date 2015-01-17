@@ -1,21 +1,37 @@
-me.PlayerEntity = me.Entity.extend({
+me.PlayerEntity = me.CustomEntity.extend({
     init: function(x, y, settings) {
-        this._super(me.Entity, 'init', [x, y, settings]);
+        this._super(me.CustomEntity, 'init', [x, y, settings]);
 
         this.attacking = false;
 
-        this.body.setVelocity(3, 15);
-
+        var initialShape;
+        if (settings.initialShape && (typeof (settings.initialShape) === "function")) {
+            initialShape = settings.initialShape();
+        } else if (settings.getTMXShapes && (typeof (settings.getTMXShapes) === "function")) {
+            initialShape = settings.getTMXShapes();
+        } else {
+            initialShape = me.TMXObject.__methods__.getTMXShapes.apply({
+            width: settings.width, height: settings.height, rotation: 0});
+        }
+        
+        this.body = new me.Body(this, initialShape);
         this.body.collisionType = me.collision.types.PLAYER_OBJECT;
         this.body.setCollisionMask(me.collision.types.ALL_OBJECT);
+        this.body.setVelocity(0.35, 0.9);
+        this.body.setMaxVelocity(3.5, 15.0);
+        this.body.setFriction(0.05, 0.01);
         
-        me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH);
-
         this.alwaysUpdate   = true;
         this.isPersistent   = true;
         this.time           = me.timer.getTime();
         this.attackCooldown = 1000;
         this.canAttack      = true;
+        
+        this.temp = {
+            tick: 1,
+            one: 0,
+            two: 0
+        };
 
         var animationtime = 70;
         
@@ -45,35 +61,38 @@ me.PlayerEntity = me.Entity.extend({
     },
     
     die: function(death) {
-            this.alive = false;
-            this.renderable.setOpacity(0);
-            
-            var deatheffect = me.game.world.addChild(me.pool.pull("DeathEffectEntity", death.x, death.y, death.angle), 99999);
-            
-            me.game.viewport.shake(7, 200);
-            
-            setTimeout((function() {
-                me.game.world.removeChild(deatheffect);
-                this.pos.x = 796;
-                this.pos.y = 301;
-                this.alive = true;
-                this.renderable.setOpacity(1);
-                this.renderable.flicker(300);
-            }).bind(this), 300);
-    },
-
-    update: function(dt) {
-        if(this.alive === false) {
-            return false;
-        }
+        this.alive = false;
+        this.renderable.setOpacity(0);
         
-        if(this.canAttack === false) {
-            if (me.timer.getTime() - this.time > this.attackCooldown) {
-                this.canAttack = true;
-            }
+        var deatheffect = me.game.world.addChild(me.pool.pull("DeathEffectEntity", death.x, death.y, death.angle), 99999);
+        
+        me.game.viewport.shake(7, 200);
+        
+        setTimeout((function() {
+            me.game.world.removeChild(deatheffect);
+            this.pos.x = 796;
+            this.pos.y = 301;
+            this.alive = true;
+            this.renderable.setOpacity(1);
+            this.renderable.flicker(300);
+        }).bind(this), 300);
+    },
+    
+    jump: function() {
+        // make sure we are not already jumping or falling
+        if (!this.body.jumping && !this.body.falling) {
+            // set current vel to the maximum defined value
+            // gravity will then do the rest
+            this.body.vel.y = -this.body.maxVel.y * me.timer.tick;
+            // set the jumping flag
+            this.body.jumping = true;
+            
+            this.renderable.setCurrentAnimation("jump");
         }
-
-        if (me.input.isKeyPressed('left')) {
+   },
+    
+    move: function(direction) {
+       if(direction === "left") {
             // flip the sprite on horizontal axis
             this.renderable.flipX(true);
             // update the entity velocity
@@ -82,7 +101,7 @@ me.PlayerEntity = me.Entity.extend({
             if (!this.renderable.isCurrentAnimation("run")) {
                 this.renderable.setCurrentAnimation("run");
             }
-        } else if (me.input.isKeyPressed('right')) {
+       } else {
             // unflip the sprite
             this.renderable.flipX(false);
             // update the entity velocity
@@ -91,50 +110,89 @@ me.PlayerEntity = me.Entity.extend({
             if (!this.renderable.isCurrentAnimation("run")) {
                 this.renderable.setCurrentAnimation("run");
             }
+       }
+       
+       this.moving = true;
+    },
+    
+    shoot: function() {
+        if(!this.canAttack){
+            return;
+        }
+        
+        this.time = me.timer.getTime();
+        this.canAttack = false;
+        this.attacking = true;
+        
+        this.renderable.setCurrentAnimation("attack", (function() {
+            this.renderable.setCurrentAnimation("stand");
+            return true;
+        }).bind(this));
+        
+        var projectile = me.pool.pull("ProjectileEntity", (this.renderable.lastflipX === false) ? (this.pos.x + 60) : (this.pos.x - 60), this.pos.y + 20, { image: 'projectile_blue', velocity: { x: (this.renderable.lastflipX === false) ? 8 : -16, y: 0 }, owner: this });
+        me.game.world.addChild(projectile, this.z);
+    },
+   
+    update: function(dt) {
+        //Make sure we're alive!
+        if(this.alive === false) {
+            return false;
+        }
+        
+        //Invoke super
+        this._super(me.CustomEntity, 'update', [dt]);
+        
+        //Check if we can attack again
+        if(this.canAttack === false) {
+            if (me.timer.getTime() - this.time > this.attackCooldown) {
+                this.canAttack = true;
+            }
+        }
+        
+        //Did we stop moving? if so, slow down
+        if(!this.moving) {
+            if(this.body.vel.x > 0) {
+                this.body.vel.x -= this.body.accel.x * me.timer.tick;
+            } else if(this.body.vel.x < 0) {
+                this.body.vel.x += this.body.accel.x * me.timer.tick;
+            } else {
+                this.body.vel.x = 0;
+            }
+        }
+        
+        //Make sure our jump animation doesn't loop
+        if (!this.body.jumping && !this.body.falling && this.renderable.isCurrentAnimation("jump")) {
+            this.renderable.setCurrentAnimation("stand");
+        }
+        
+        //Directional controls
+        if (me.input.isKeyPressed('left')) {
+            this.move("left");
+        } else if (me.input.isKeyPressed('right')) {
+            this.move("right");
         } else {
-            this.body.vel.x = 0;
+            if(this.body.vel.x > 0.5) {
+                this.body.vel.x -= this.body.accel.x * me.timer.tick;
+            } else if(this.body.vel.x < -0.5) {
+                this.body.vel.x += this.body.accel.x * me.timer.tick;
+            } else {
+                this.body.vel.x = 0;
+            }
             
             // change to the standing animation
-            if (this.attacking === false && this.body.jumping === false) {
+            if (this.body.jumping === false && !this.renderable.isCurrentAnimation("attack")) {
                 this.renderable.setCurrentAnimation("stand");
             }
         }
         
-        //Stop the looping jump animation
-        if(this.body.vel.y == 0) {
-            this.body.jumping = false;
-            if(this.renderable.isCurrentAnimation("jump")) {
-                this.renderable.setCurrentAnimation("stand");
-            }
-        }
-        
-        //Fix stuck animation
-        if(!this.renderable.isCurrentAnimation("attack")) {
-            this.attacking = false;
-        }
-
+        //Jump
         if (me.input.isKeyPressed('jump')) {
-            // make sure we are not already jumping or falling
-            if (!this.body.jumping && !this.body.falling) {
-                // set current vel to the maximum defined value
-                // gravity will then do the rest
-                this.body.vel.y = -this.body.maxVel.y * me.timer.tick;
-                // set the jumping flag
-                this.body.jumping = true;
-                
-                this.renderable.setCurrentAnimation("jump", function() {
-                    return true;
-                });
-            }
-        } else if(me.input.isKeyPressed("attack")) {
-            if (!this.renderable.isCurrentAnimation("attack") && this.canAttack) {
-                this.attacking = true;
-                this.renderable.setCurrentAnimation("attack", (function() {
-                    this.attacking = false;
-                    return true;
-                }).bind(this));
-                this.shoot();
-            }
+            this.jump();
+        }
+        
+        //Attack
+        if(me.input.isKeyPressed("attack")) {
+            this.shoot();
         }
         
         // apply physics to the body (this moves the entity)
@@ -144,7 +202,7 @@ me.PlayerEntity = me.Entity.extend({
         me.collision.check(this);
         
         // return true if we moved or if the renderable was updated
-        return (this._super(me.Entity, 'update', [dt]) || this.body.vel.x !== 0 || this.body.vel.y !== 0);
+        return (this.body.vel.x !== 0 || this.body.vel.y !== 0 || true);
     },
 
     /**
@@ -155,19 +213,6 @@ me.PlayerEntity = me.Entity.extend({
         //Dont collide with other playerentities
         if(response.b.body.collisionType === me.collision.types.NPC_OBJECT || response.b.body.collisionType === me.collision.types.PLAYER_OBJECT || response.b.body.collisionType === me.collision.types.ENEMY_OBJECT) {
             return false;
-        }
-        
-        if(this.alive) {
-            //Check if our player collides with any of the level borders (for example: he fell off the platform)
-            if(collidingObject.name.match("^death_*")) {
-                death = {
-                    angle: parseInt(collidingObject.name.match("^death_(.*)")[1]),
-                    x: response.a.pos.x,
-                    y: response.a.pos.y
-                }
-                
-                response.a.die(death);
-            }
         }
         
         // Make all other objects solid

@@ -10,9 +10,21 @@ game.AIGoalDodgeAttack = game.AIGoal.extend({
             if(collision[key].body !== undefined) {
                 if(collision[key].body.collisionType === me.collision.types.PROJECTILE_OBJECT) {
                     if(collision[key].settings.owner !== this.entity) {
+                        
+                        //Check distance of the projectile
                         if(Math.abs(this.entity.pos.x - collision[key].pos.x) < 150 && Math.abs(this.entity.pos.y - collision[key].pos.y) < this.entity.height/2) {
-                            return true;
+                            //Check if the projectile is left or right of the entity
+                            if(this.entity.pos.x < collision[key].pos.x) { //right of the entity
+                                //Check if the projectile is moving to the left
+                                return (collision[key].body.vel.x < 0);
+                            } else { //left of the entity
+                                //Check if the projectile is moving to the right
+                                return (collision[key].body.vel.x > 0);
+                            }
+                            
+                            return false;
                         }
+                        
                     }
                 }
             }

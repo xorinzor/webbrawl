@@ -3,27 +3,22 @@ me.CustomImageLayer = me.ImageLayer.extend({
 		
 		this._super(me.ImageLayer, "init", [name, width, height, image, z, ratio]);
 		
-		this.x = this.lastpos.x = this.pos.x = x;
-		this.y = this.lastpos.y = this.pos.y = y;
-
-		this.settings = {
-			x: x,
-			y: y
-		};
+		//added the this.pos.<x/y> to prevent "jumping" of the imagelayer when moving the viewport around
+		this.pos.x = this.x = x;
+		this.pos.y = this.y = y;
 	},
 	
 	updateLayer : function (vpos) {
-		this.y = this.lastpos.y = this.pos.y = this.settings.y - vpos.y;
 		this._super(me.ImageLayer, "updateLayer", [ vpos ]);
-	},
-
-	draw: function(renderer, rect) {
-		var context = renderer.getContext();
-		context.save(); 
-		context.translate(this.x, this.y);
 		
-		this._super(me.ImageLayer, "draw", [renderer, rect]);
+		//I couldn't get any modifications on the Y-axis to work so I left this static
+		this.pos.y = vpos.y - this.y;
 		
-		context.restore();
+		if(this.repeatX) {
+			this.pos.x += (((vpos.x - this.lastpos.x) - this.x) * this.ratio.x) % this.imagewidth;
+	        this.pos.x = (this.imagewidth + this.pos.x) % this.imagewidth;
+		} else {
+			this.pos.x = vpos.x - this.x;	
+		}
 	}
 }); 

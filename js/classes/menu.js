@@ -238,7 +238,7 @@ game.Menu = me.Container.extend({
 		this.parentMenu = null;
 		this.name = "Menu";
 
-		this.addChild.defer(me.game.world, new me.ImageLayer("mainmenubackground", me.game.viewport.getWidth(), me.game.viewport.getHeight(), settings.backgroundimage, 2));
+		me.game.world.addChild.defer(me.game.world, new me.ImageLayer("mainmenubackground", me.game.viewport.getWidth(), me.game.viewport.getHeight(), settings.backgroundimage, 1));
 	},
  
 	addMenuItem : function (settings) {
@@ -250,6 +250,7 @@ game.Menu = me.Container.extend({
 	},
 
 	addMenuButton : function (settings) {
+		
 		settings.parentMenu = this;
 		var menuButton = new game.MenuButton(settings);
 		this.addChild.defer(this, menuButton);

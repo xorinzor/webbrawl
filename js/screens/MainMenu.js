@@ -15,6 +15,7 @@ game.Screen.MainMenu = me.ScreenObject.extend({
 			text : 'Play',
 			x : (me.game.viewport.width / 2) - 95,
 			y : 360,
+			z: 999,
 			callback : function() {
 				me.game.viewport.fadeIn("#000", 300, function() {
 					me.state.change(me.state.PLAY);
@@ -27,6 +28,7 @@ game.Screen.MainMenu = me.ScreenObject.extend({
 			text : 'Options',
 			x : (me.game.viewport.width / 2) - 95,
 			y : 420,
+			z: 999,
 			callback : function() {
 				console.log("button clicked");
 			}
@@ -37,6 +39,7 @@ game.Screen.MainMenu = me.ScreenObject.extend({
 			text : 'Help',
 			x : (me.game.viewport.width / 2) - 95,
 			y : 480,
+			z: 999,
 			callback : function() {
 				console.log("button clicked");
 			}
@@ -47,6 +50,7 @@ game.Screen.MainMenu = me.ScreenObject.extend({
 			text : 'Quit',
 			x : (me.game.viewport.width / 2) - 95,
 			y : 540,
+			z: 999,
 			callback : function() {
 				console.log("button clicked");
 			}

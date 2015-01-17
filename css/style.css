@@ -1,13 +1,11 @@
 @font-face {
-	font-family: "Georgia";
-	font-size: 8px;
-	src: url(../data/font/georgia.ttf);
-}
-
-@font-face {
-	font-family: "Nevis";
-	font-size: 20px;
-	src: url(../data/font/nevis.ttf);
+  font-family: 'Nevis';
+  src: url('../data/font/nevis.eot'); /* IE9 Compat Modes */
+  src: url('../data/font/nevis.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+  		url('../data/font/nevis.woff2') format('woff2'), /* Super Modern Browsers */
+		url('../data/font/nevis.woff') format('woff'), /* Pretty Modern Browsers */
+		url('../data/font/nevis.ttf')  format('truetype'), /* Safari, Android, iOS */
+		url('../data/font/nevis.svg#nevis') format('svg'); /* Legacy iOS */
 }
 
 body {

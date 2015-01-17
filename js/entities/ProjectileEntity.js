@@ -1,4 +1,4 @@
-game.ProjectileEntity = me.Entity.extend({
+game.ProjectileEntity = me.CustomEntity.extend({
     init: function(x, y, settings) {
         settings = $.extend({
             spritewidth: 51,
@@ -30,7 +30,7 @@ game.ProjectileEntity = me.Entity.extend({
     update: function(dt) {
         if(this.pos.x < 0 || this.pos.x > me.game.currentLevel.width) {
             me.game.world.removeChild(this);
-            return false;
+            return true;
         }
         
         if (this.body.accel.x > 0) {
@@ -44,11 +44,7 @@ game.ProjectileEntity = me.Entity.extend({
         this.body.update(dt);
         me.collision.check(this);
         
-        if (this.body.vel.x !== 0 &&  this.body.vel.y !== 0) {
-            return this._super(me.Entity, 'update', [dt]);
-        }
-        
-        return false;
+        return true;
     },
 
     onCollision: function(response, collidingObject) {
