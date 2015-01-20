@@ -1,6 +1,6 @@
 //imports
 var garageServer    = require('garageserver.io'),
-    gamePhysics     = require('./shared/core');
+    gamePhysics     = require('../shared/core');
 
 module.exports = Game;
 
@@ -27,6 +27,7 @@ Game.prototype.start = function () {
 };
 
 Game.prototype.update = function () {
+    /*
     var players     = this.server.getPlayers(),
         entities    = this.server.getEntities(),
         self        = this;
@@ -46,4 +47,5 @@ Game.prototype.update = function () {
             self.server.updateEntityState(entity.id, newState);
         }
     }
+    */
 };
