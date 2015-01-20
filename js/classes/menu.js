@@ -3,18 +3,19 @@ game.MenuButton = me.GUI_Object.extend({
 		settings = $.extend({}, game.sprites.button[settings.spritename], settings);
 
 		this._super(me.GUI_Object, "init", [settings.x, settings.y, settings]);
-		this.parentMenu = settings.parentMenu;
-		this.subMenu = settings.subMenu;
-		this.callback = settings.callback;
-		this.name = settings.spritename;
-		this.z = settings.z;
-		this.offset.x = settings.state.normal.x || 0;
-		this.offset.y = settings.state.normal.y || 0;
-		this.hover = false;
-		this.isClicked = false;
-		this.isSelected = false; //Wheter or not to keep the button active, in a "selected" state
-		this.updateWhenPaused = settings.updateWhenPaused || false;
-		this.settings = settings;
+		this.parentMenu 		= settings.parentMenu;
+		this.subMenu 			= settings.subMenu;
+		this.callback 			= settings.callback;
+		this.name 				= settings.spritename;
+		this.z 					= settings.z;
+		this.offset.x 			= settings.state.normal.x || 0;
+		this.offset.y 			= settings.state.normal.y || 0;
+		this.hover 				= false;
+		this.isClicked 			= false;
+		this.isSelected 		= false; 								// Wheter or not to keep the button active, in a "selected" state
+		this.updateWhenPaused 	= settings.updateWhenPaused || false;
+		this.settings 			= settings;
+		this.disabled			= false;								// Prevent the button from beeing clicked or released
 
 		this.textOffset = {
 			x: 0,
@@ -27,10 +28,10 @@ game.MenuButton = me.GUI_Object.extend({
 			this.setSelected(settings.isSelected);
 		}
 
-		if(typeof settings.isDisabled !== "boolean") {
-			this.isDisabled = false;
+		if(typeof settings.disabled !== "boolean") {
+			this.disabled = false;
 		} else {
-			this.setDisabled(settings.isDisabled);
+			this.setDisabled(settings.disabled);
 		}
 
 		this.disableEvents();
@@ -43,7 +44,7 @@ game.MenuButton = me.GUI_Object.extend({
     	//Make sure we can actually hover over the object and our mouse is within the rectangle of the object's x/y coords
         this.hover = this.inViewport && this.getBounds().containsPoint(event.gameX, event.gameY);
 
-        if(this.isClicked === false && this.isSelected === false && this.isDisabled === false && ((me.state.isPaused() === true && this.updateWhenPaused === true) || me.state.isPaused() === false)) {
+        if(this.isClicked === false && this.isSelected === false && this.disabled === false && ((me.state.isPaused() === true && this.updateWhenPaused === true) || me.state.isPaused() === false)) {
         	this.updated = true;
 
         	if(this.hover === true && typeof(this.settings.state.hover) !== "undefined") {
@@ -58,7 +59,7 @@ game.MenuButton = me.GUI_Object.extend({
 
 	onClick: function(e) {
 		// Only do stuff when our container is in the world.
-		if (!this.parentMenu.ancestor || this.isDisabled === true || (me.state.isPaused() === true && this.updateWhenPaused === false)) {
+		if (!this.parentMenu.ancestor || this.disabled === true || (me.state.isPaused() === true && this.updateWhenPaused === false)) {
 			return;
 		}
 
@@ -83,7 +84,7 @@ game.MenuButton = me.GUI_Object.extend({
 
 	onRelease: function(e) {
 		// Only do stuff when our container is in the world.
-		if (!this.parentMenu.ancestor || this.isDisabled === true || (me.state.isPaused() === true && this.updateWhenPaused === false)) {
+		if (!this.parentMenu.ancestor || this.disabled === true || (me.state.isPaused() === true && this.updateWhenPaused === false)) {
 			return;
 		}
 
@@ -138,7 +139,7 @@ game.MenuButton = me.GUI_Object.extend({
 
 	setDisabled: function(state) {
 		if(typeof state === "boolean") {
-			this.isDisabled = state;
+			this.disabled = state;
 			if(state === true) {
 				this.offset.x = this.settings.state.inactive.x || this.settings.state.normal.x || 0;
 				this.offset.y = this.settings.state.inactive.y || this.settings.state.normal.y || 0;
@@ -148,7 +149,7 @@ game.MenuButton = me.GUI_Object.extend({
 			}
 		} else {
 			console.error("Invalid variable-type passed for 'type'");
-			this.isDisabled = false;
+			this.disabled = false;
 		}
 
 		this.updated = true;
@@ -237,7 +238,7 @@ game.Menu = me.Container.extend({
 
 		this.parentMenu = null;
 		this.name = "Menu";
-
+		
 		me.game.world.addChild.defer(me.game.world, new me.ImageLayer("mainmenubackground", me.game.viewport.getWidth(), me.game.viewport.getHeight(), settings.backgroundimage, 1));
 	},
  

@@ -53,7 +53,7 @@
 
 		<script type="text/javascript" src="js/screens/CustomLoadingScreen.js"></script>
 		<script type="text/javascript" src="js/screens/PlayScreen.js"></script>
-		<script type="text/javascript" src="js/screens/MainMenu.js"></script>
+		<script type="text/javascript" src="js/screens/MainMenuScreen.js"></script>
 		
 		<script type="text/javascript" src="js/ai/AIGoal.js"></script>
 		<script type="text/javascript" src="js/ai/AIHandler.js"></script>
